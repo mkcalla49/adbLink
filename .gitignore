@@ -1,0 +1,13 @@
+.DS_Store
+adbLink.user*
+adblink.log
+adblink.log.old
+adblink.db
+*.autosave
+*~
+build
+.qmake.stash
+adbfiles/xbin/
+Makefile
+backup
+repgit
