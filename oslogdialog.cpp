@@ -37,6 +37,7 @@ oslogDialog::oslogDialog(QWidget *parent) :
     ui(new Ui::oslogDialog)
 {
     ui->setupUi(this);
+    setWindowFlags(windowFlags() & ~Qt::WindowContextHelpButtonHint);
 
     QString osldir = QDir::homePath();
 

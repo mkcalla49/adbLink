@@ -41,6 +41,7 @@ usbfileDialog::usbfileDialog(QWidget *parent) :
 
     ui->setupUi(this);
 
+    setWindowFlags(windowFlags() & ~Qt::WindowContextHelpButtonHint);
 
 
 
@@ -101,3 +102,12 @@ usbfileDialog::~usbfileDialog()
     delete ui;
 }
 
+/*
+void usbfileDialog::on_usblistWidget_doubleClicked(const QModelIndex &index)
+{
+    int i = ui->usblistWidget->currentRow();
+    ui->usblistWidget->item(i)->setForeground(Qt::green);
+    ui->usblistWidget->item(i)->setBackground(Qt::black);
+
+}
+*/

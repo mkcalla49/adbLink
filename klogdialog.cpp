@@ -43,6 +43,10 @@ klogDialog::klogDialog(QWidget *parent) :
 {
     ui->setupUi(this);
 
+    setWindowFlags(windowFlags() & ~Qt::WindowContextHelpButtonHint);
+
+
+
 }
 
 klogDialog::~klogDialog()

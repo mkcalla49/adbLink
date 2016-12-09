@@ -59,12 +59,12 @@ p, li { white-space: pre-wrap; }
     <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; f text-decoration: underline;&quot;&gt;Resources&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
    </property>
   </widget>
-  <widget class="QWidget" name="">
+  <widget class="QWidget" name="layoutWidget">
    <property name="geometry">
     <rect>
      <x>60</x>
      <y>430</y>
-     <width>337</width>
+     <width>339</width>
      <height>18</height>
     </rect>
    </property>
@@ -72,7 +72,7 @@ p, li { white-space: pre-wrap; }
     <item>
      <widget class="QLabel" name="label_12">
       <property name="text">
-       <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;a href=&quot;http://www.jocala.com/video.html&quot;&gt;&lt;span style=&quot; text-decoration: underline; color:#0000ff;&quot;&gt;adbLink Video Help&lt;/span&gt;&lt;/a&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+       <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;a href=&quot;https://www.youtube.com/channel/UCCeSmfSiyyVKcz7k-AJMOzA&quot;&gt;&lt;span style=&quot; text-decoration: underline; color:#0000ff;&quot;&gt;adbLink Video Help&lt;/span&gt;&lt;/a&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
       </property>
       <property name="openExternalLinks">
        <bool>true</bool>
@@ -110,12 +110,12 @@ p, li { white-space: pre-wrap; }
     </item>
    </layout>
   </widget>
-  <widget class="QWidget" name="">
+  <widget class="QWidget" name="layoutWidget">
    <property name="geometry">
     <rect>
      <x>120</x>
      <y>400</y>
-     <width>205</width>
+     <width>206</width>
      <height>18</height>
     </rect>
    </property>
@@ -148,12 +148,12 @@ p, li { white-space: pre-wrap; }
     </item>
    </layout>
   </widget>
-  <widget class="QWidget" name="">
+  <widget class="QWidget" name="layoutWidget">
    <property name="geometry">
     <rect>
      <x>100</x>
      <y>370</y>
-     <width>249</width>
+     <width>250</width>
      <height>18</height>
     </rect>
    </property>

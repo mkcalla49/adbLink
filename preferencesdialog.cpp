@@ -104,6 +104,7 @@ preferencesDialog::preferencesDialog(QWidget *parent) :
     ui(new Ui::preferencesDialog)
 {
     ui->setupUi(this);
+    setWindowFlags(windowFlags() & ~Qt::WindowContextHelpButtonHint);
 
     if (os_pref == 1)
             {
@@ -670,7 +671,8 @@ void preferencesDialog::disable_ui()
 ////////////////////////////////////////////////////////////////////
 void preferencesDialog::enable_ui()
 {
-    ui->port->setEnabled(true);
+    ui->port->setEnabled(true);  
+    ui->port->setText("5555");
     ui->isusb->setEnabled(true);
     ui->listkodirootBox->setEnabled(true);
 

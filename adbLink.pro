@@ -8,7 +8,7 @@ QT       += core gui sql network concurrent
 
 greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 
-LIBS += -lQt5Concurrent
+#LIBS += -lQt5Concurrent
 
 TARGET = adbLink
 TEMPLATE = app
@@ -30,7 +30,9 @@ SOURCES += main.cpp\
     klogdialog.cpp \
     oslogdialog.cpp \
     editordialog.cpp \
-    searchdialog.cpp
+    searchdialog.cpp \
+    forcequitdialog.cpp \
+    filedownloader.cpp
 
 
 RESOURCES = adbLink.qrc
@@ -51,7 +53,10 @@ HEADERS  += mainwindow.h \
     klogdialog.h \
     oslogdialog.h \
     editordialog.h \
-    searchdialog.h
+    searchdialog.h \
+    forcequitdialog.h \
+    filedownloader.h
+
 
 FORMS    += mainwindow.ui \
     dialog2.ui \
@@ -69,7 +74,8 @@ FORMS    += mainwindow.ui \
     klogdialog.ui \
     oslogdialog.ui \
     editordialog.ui \
-    searchdialog.ui
+    searchdialog.ui \
+    forcequitdialog.ui
 
 RC_FILE = adbLink.rc
 

@@ -2,6 +2,7 @@
 #define MAINWINDOW_H
 
 #include <QMainWindow>
+#include <QProcess>
 
 namespace Ui {
 class MainWindow;
@@ -19,9 +20,11 @@ public:
     explicit MainWindow(QWidget *parent = 0);
     ~MainWindow();
 
-class MyClass;
+
 
 private slots:
+
+void downloadFile(const QString &url, const QString &path);
 
     void on_actionAbout_triggered();
 
@@ -38,6 +41,8 @@ private slots:
     void on_actionQuit_triggered();
 
     void on_uninstall_Button_clicked();
+
+    bool installAPK(QString filename);
 
     void on_actionHelp_triggered();
 
@@ -112,8 +117,7 @@ private slots:
 
    void start_server();
 
-    void adberror();
-
+  //  void adberror();
 
    bool is_package(QString package);
 
@@ -152,13 +156,16 @@ private slots:
 
     void on_fdellButton_clicked();
 
+    void onArmCompleted();
+
 
     void on_donate_clicked();
 
     void get_data();
 
-    void onReqCompleted();
+     void get_kodi_address(QString mcurl);
 
+    void onReqCompleted();
 
     void on_actionView_Log_triggered();
 
@@ -205,8 +212,6 @@ private slots:
 
    void on_mvdataButton_clicked();
 
-   void on_keypadButton_clicked();
-
    void on_actionView_Kodi_Log_triggered();
 
    void on_actionView_adbLink_Log_triggered();
@@ -234,11 +239,24 @@ private slots:
 
    void on_actionTest_adb_connection_triggered();
 
+   void on_actionStop_Application_triggered();
+
+   void on_actionStart_Application_triggered();
+
+   void on_getkodiButton_clicked();
+
+   void on_keypadButton_clicked();
+
+   void on_actionDownload_SPMC_triggered();
+
 private:
     Ui::MainWindow *ui;
 
 
 
 };
+
+
+
 
 #endif // MAINWINDOW_H

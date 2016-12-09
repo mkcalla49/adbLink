@@ -3,41 +3,64 @@
 <b><u>The Device Setup Dialog</b></u>
 <p>
 
-<b><u>OS Type</b></u><br>
-Choose the operating system your Kodi runs on. The default is Android. Changing the operating system also changes the file path to Kodi's data folder to the default for the chosen OS.
+Adding a device record with adbLink
 <p>
-<b><u>Description</b></u><br>
-Enter a descriptive title for your device.
+Records are added in two ways: Pressing the "New" button or
+double-clicking an USB serial number in the "Android Devices"
+box.
 <p>
-<b><u>Address (Android only)</b></u><br>
-Enter the device IP address. A device name is also allowable
-if you have set it up with your router.
+Pressing "New" brings up an empty record screen. Double-clicking a
+USB serial number does the same but fills in pertinent USB data
+for the new record.
+<p>
+Entering data:
+<p>
+Start with a completely blank record screen, by pressing "New".
+<p>
+Record data fields:
+<p>
+Choose Kodi OS. The default is android.  However you can choose Windows, macOS or Linux
+as well, depending on what build of Kodi you're working with.
+<p>
+Description:
+A description for the device, e.g. Livingroom TV. A description must be unique. You couldn't have
+two devices named "Livingroom TV".
+<p>
+Address. The address of this new device. It can be an IP address or a USB serial number. If you've
+selected a non-Android OS, this field is inactive.
+<p>
+Kodi Partition: For Android the default is /sdcard/ For other OSes, this field is inactive.
+<p>
+Media Center Package name: For Android the default is org.xbmc.kodi For other OSes, this field is inactive.
+<p>
+File Path: This the path to Kodi's data folder. For Android it defaults to /files/.kodi, on other OSes the path changes.
+When you choose the OS, this field is filled in with a reasonable default.  You can also use the File Path button
+to browse your local computer for the Kodi data area.
+<p>
+Pull Folder: This will allow you to set the file path for files copied from your Android device to be sent to.
+<p>
+USB checkbox <br>
+IP address port
+<p>
+Both of these fields are  automatically filled in, but you can override them.
 <p>
 
-<b><u>Package name (Android only)</b></u>, default: org.xbmc.kodi. <br>
-Select the package name by choosing your media center software from the Media Center presets, or enter package name directly. If you are running Kodi leave this setting unchanged.
-<p>
-<b><u>File Path</b></u><br>
-This is the location of Kodi's data on your device. This location varies depending on the OS Kodi is running on and can be entered in different ways:
-<p>
-Change the Kodi OS to select a default value per OS<br>
-<p>
-Select a Media Center preset (Android only)<br>
-Available presets:<br>
+Media center radio buttons: <Android only> <br>
+The choices are:<br>
 Kodi<br>
 SPMC<br>
 Other<br>
 <p>
-File Path button<br>
-Browse the adbLink filesystem to locate your file path, useful if Kodi's data is in a non-standard location (e.g. a network share).
+Selecting Kodi or SPMC fills in the correct package name for the choice. Selecting
+"Other" allows you to enter your own value for package name.
 <p>
-Manually enter
+Android Partitions:  This listbox shows possible Kodi partitons on the
+device. If your device is not connected only /sdcard/ will be listed.
+If connected, you may see other partitons, such as /sdcard1/.
 <p>
-<b><u>Pull Folder (Android only)</b></u>, default: User's home directory.<br>
-Choose the folder where pulled Kodi files and screenshot pngs are placed.
-<p>
-The <b>Check for updates at startup</b> checkbox causes adbLink to check jocala.com for updates at startup. This is on by default.
-<p>
+Double-clicking a partition in this box will change the value in the
+Kodi Partition field.
+
 <p>
 If you have questions or comments, please email jocala@jocala.com or visit one of the forums linked below. adbLink produces a log file, adbfire.log, with each run. Include it in your email or post if you're having problems.<p>
 <a href="menu.html">main menu</a>

@@ -58,6 +58,9 @@ dataDialog::dataDialog(QWidget *parent) :
 {
     ui->setupUi(this);
 
+    setWindowFlags(windowFlags() & ~Qt::WindowContextHelpButtonHint);
+
+
     rval2=1;
 
 

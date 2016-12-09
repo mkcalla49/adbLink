@@ -5,6 +5,7 @@
         <file>assets/donatel.png</file>
         <file>assets/goat.png</file>
         <file>assets/kodi.png</file>
+        <file>assets/adblink.png</file>
         <file>assets/kodi.html</file>
         <file>assets/about.html</file>
         <file>assets/main.html</file>
@@ -19,7 +20,6 @@
         <file>assets/nonandroid.html</file>
         <file>assets/console.html</file>
         <file>assets/editor.html</file>
-        <file>assets/filerw.html</file>
         <file>assets/installapk.html</file>
         <file>assets/offline.html</file>
         <file>assets/menu.html</file>
@@ -37,8 +37,5 @@
         <file>assets/kodifolders.html</file>
         <file>assets/download.html</file>
         <file>assets/path2clip.html</file>
-        <file>assets/fsro.html</file>
-        <file>assets/fsrw.html</file>
     </qresource>
 </RCC>
-

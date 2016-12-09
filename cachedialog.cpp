@@ -73,6 +73,10 @@ cacheDialog::cacheDialog(QWidget *parent) :
     ui(new Ui::cacheDialog)
 {
     ui->setupUi(this);
+
+    setWindowFlags(windowFlags() & ~Qt::WindowContextHelpButtonHint);
+
+
 }
 
 cacheDialog::~cacheDialog()

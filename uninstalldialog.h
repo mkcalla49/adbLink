@@ -2,6 +2,8 @@
 #define UNINSTALLDIALOG_H
 
 #include <QDialog>
+#include <QListWidget>
+#include <QListWidgetItem>
 
 namespace Ui {
 class uninstallDialog;
@@ -41,6 +43,8 @@ private slots:
    void loadList();
    void makeFile();
    void loadBox();
+
+   void on_unlistWidget_itemClicked(QListWidgetItem *item);
 
 private:
     Ui::uninstallDialog *ui;

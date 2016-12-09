@@ -41,7 +41,10 @@ public:
 
 
 
-private slots:
+
+//private slots:
+ //   void on_usblistWidget_doubleClicked(const QModelIndex &index);
+
 
 };
 

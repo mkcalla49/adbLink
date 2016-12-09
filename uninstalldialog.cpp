@@ -44,14 +44,10 @@ bool uninstallDialog::keepBox() {
 
 uninstallDialog::uninstallDialog(const QString &port, const QString &daddr,QWidget *parent) :
    QDialog(parent),m_port(port),m_daddr(daddr),
-    ui(new Ui::uninstallDialog)
+    ui(new Ui::uninstallDialog) {
 
-
-
-
-{
-
-
+  ui->setupUi(this);
+  setWindowFlags(windowFlags() & ~Qt::WindowContextHelpButtonHint);
 
     if (ost == 1)
        {
@@ -181,4 +177,9 @@ void uninstallDialog::loadBox()
          file3.close();
 
       QFile::remove(tmpstr);
+}
+
+void uninstallDialog::on_unlistWidget_itemClicked(QListWidgetItem *item)
+{
+    QMessageBox::critical(this,"","Error reading file!");
 }

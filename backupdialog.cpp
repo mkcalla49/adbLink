@@ -178,6 +178,7 @@ backupDialog::backupDialog(QWidget *parent) :
 {
     ui->setupUi(this);
 
+    setWindowFlags(windowFlags() & ~Qt::WindowContextHelpButtonHint);
 
     QString tmpstr;
     QString commstr;

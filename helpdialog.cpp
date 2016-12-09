@@ -9,6 +9,9 @@ helpDialog::helpDialog(QWidget *parent) :
 {
     ui->setupUi(this);
 
+    setWindowFlags(windowFlags() & ~Qt::WindowContextHelpButtonHint);
+
+
     ui->textBrowser->setSource(*new QUrl("qrc:/assets/menu.html"));
 
     ui->textBrowser->setWindowTitle("adbLink Help");

@@ -63,6 +63,8 @@ adblogDialog::adblogDialog(QWidget *parent) :
 {
     ui->setupUi(this);
 
+     setWindowFlags(windowFlags() & ~Qt::WindowContextHelpButtonHint);
+
 
     if (os1 == 1)
        {

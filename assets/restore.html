@@ -1,13 +1,26 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
 <html><head><title>Restore Kodi</title></head><body>
-The <b>"Restore Kodi"</b> button restores a backed up copy of org.xbmc.* (or fork) to the device. Kodi must be closed in order to  restore.
+The <b>"Restore Kodi"</b> button restores a backed up copy of Kodi's data to the device. Kodi must be closed in order to  restore.
 <p>
 
+Default Kodi data locations:<p>
+For Android:<p>
+/sdcard/Android/data/org.xbmc.kodi/files/.kodi
+<p>
+For Windows:<p>
+/Users/[userid]/AppData/Roaming/Kodi
+<p>
+For macOS:<p>
+/Users/[userid]/Library/Application Support/Kodi
+<p>
+For Linux:<p>
+/home/[userid]/.kodi
 
-<b><u>Device data location</b></u><br>
 
+<p>
+<b><u>Android device external data locations</b></u><p>
+For Android:
 <ul>
-<li>Default</li>
 <li>/storage/sdcard1/</li>
 <li>/storage/usbotg/</li>
 <li>/storage/extUsb/</li>
@@ -15,10 +28,12 @@ The <b>"Restore Kodi"</b> button restores a backed up copy of org.xbmc.* (or for
 </ul>
 <p>
 
-If your data is stored on an external location, choose the location from the presets above, and adbLink will restore your data to that point. <p>Please note that this applies to entire datasets only. If you have elected to move thumbnails only to external, you will have to complete this after the restore completes, using
+If your data is stored on an external location, choose the location from the displayed presets, and adbLink will restore your data to that point. <p>Please note that this applies to entire datasets only. If you have elected to move thumbnails only to external, you will have to complete this after the restore completes, using
 adbLink's <a href="mvdata.html">move data dialog</a>,
 <p>
-Please note that adbLink will not restore backups created by other programs or addons.
+adbLink will not restore backups created by other programs or addons.
+<p>
+Addons: adbLink is tested with official Kodi repository addons only. If you have issues restoring a non-repository addon, write jocala@jocala.com with full details.
 <p>
 If you have questions or comments, please email jocala@jocala.com or visit one of the forums linked below. adbLink produces a log file, adbfire.log, with each run. Include it in your email or post if you're having problems.<p>
 <a href="menu.html">main menu</a>

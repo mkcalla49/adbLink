@@ -6,6 +6,8 @@ searchDialog::searchDialog(QWidget *parent) :
     ui(new Ui::searchDialog)
 {
     ui->setupUi(this);
+    setWindowFlags(windowFlags() & ~Qt::WindowContextHelpButtonHint);
+
 }
 
 searchDialog::~searchDialog()

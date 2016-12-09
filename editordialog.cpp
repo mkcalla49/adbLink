@@ -24,6 +24,9 @@ editorDialog::editorDialog(QWidget *parent) :
     ui(new Ui::editorDialog)
 {
     ui->setupUi(this);
+    setWindowFlags(windowFlags() & ~Qt::WindowContextHelpButtonHint);
+
+
 }
 
 editorDialog::~editorDialog()

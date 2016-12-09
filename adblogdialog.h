@@ -12,9 +12,12 @@ class adblogDialog : public QDialog
 {
     Q_OBJECT
 
+
 public:
     explicit adblogDialog(QWidget *parent = 0);
     ~adblogDialog();
+
+
 
 private slots:
     void on_copyButton_clicked();

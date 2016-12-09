@@ -15,6 +15,9 @@ Dialog2::Dialog2(QWidget *parent) :
 {
     ui->setupUi(this);
 
+    setWindowFlags(windowFlags() & ~Qt::WindowContextHelpButtonHint);
+
+
     QPixmap pix(":/assets/donate.png");
     QIcon icon(pix);
     ui->donate->setIcon(icon);

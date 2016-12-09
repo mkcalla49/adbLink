@@ -95,22 +95,6 @@
    </hints>
   </connection>
   <connection>
-   <sender>usblistWidget</sender>
-   <signal>itemDoubleClicked(QListWidgetItem*)</signal>
-   <receiver>usbfileDialog</receiver>
-   <slot>accept()</slot>
-   <hints>
-    <hint type="sourcelabel">
-     <x>417</x>
-     <y>125</y>
-    </hint>
-    <hint type="destinationlabel">
-     <x>288</x>
-     <y>138</y>
-    </hint>
-   </hints>
-  </connection>
-  <connection>
    <sender>pushButton_2</sender>
    <signal>clicked()</signal>
    <receiver>usbfileDialog</receiver>
@@ -123,6 +107,22 @@
     <hint type="destinationlabel">
      <x>172</x>
      <y>131</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>usblistWidget</sender>
+   <signal>itemDoubleClicked(QListWidgetItem*)</signal>
+   <receiver>usbfileDialog</receiver>
+   <slot>accept()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>170</x>
+     <y>120</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>172</x>
+     <y>138</y>
     </hint>
    </hints>
   </connection>

@@ -98,6 +98,9 @@ keyboardDialog::keyboardDialog(QWidget *parent) :
     ui(new Ui::keyboardDialog)
 {
     ui->setupUi(this);
+
+    setWindowFlags(windowFlags() & ~Qt::WindowContextHelpButtonHint);
+
 }
 
 keyboardDialog::~keyboardDialog()

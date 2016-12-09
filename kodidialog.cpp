@@ -9,6 +9,7 @@ kodiDialog::kodiDialog(QWidget *parent) :
     ui(new Ui::kodiDialog)
 {
     ui->setupUi(this);
+    setWindowFlags(windowFlags() & ~Qt::WindowContextHelpButtonHint);
 
     QPixmap pix2(":/assets/kodi.png");
     QIcon icon2(pix2);

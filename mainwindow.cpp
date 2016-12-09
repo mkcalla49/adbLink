@@ -6,10 +6,12 @@
 #include "editordialog.h"
 #include "keyboarddialog.h"
 #include "usbfiledialog.h"
+#include "filedownloader.h"
 #include "kodidialog.h"
 #include "cachedialog.h"
 #include "datadialog.h"
 #include "backupdialog.h"
+#include "forcequitdialog.h"
 #include "restdialog.h"
 #include "klogdialog.h"
 #include "oslogdialog.h"
@@ -69,7 +71,10 @@ int os=2;
 
 
 const QString vqurl = "http://www.jocala.com/version.txt";
-const QString version = "2.06";
+const QString armurl = "http://www.jocala.com/armlink.txt";
+
+
+const QString version = "2.07";
 
 bool isConnected = false;
 bool serverRunning = false;
@@ -123,7 +128,6 @@ QString devstr4 = "  Console Mode";
 QString program = "adbLink";
 QString tempdir = "/data/local/tmp/";
 
-
 int usbcheck;
 int rootpath;
 int ftvupdate;
@@ -150,18 +154,16 @@ QString string3 = "";
 QString string4 = "";
 QString string5 = "";
 
-QString stderrtxt;
-
 QFutureWatcher<void> watcher;
 QFutureWatcher<void> watcher1;
-QProcess run_command;
 
 
 QSqlDatabase db;
 
 
+
 //////////////////////////////////////////////
- MainWindow::MainWindow(QWidget *parent) :
+MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
     ui(new Ui::MainWindow)
 {
@@ -275,16 +277,14 @@ QSqlDatabase db;
 
 
        dbstring = adbdir+"adblink.db";
-      xmldir = adbdir+"remotes/";
-      splashdir = adbdir+"splash/";
+       xmldir = adbdir+"remotes/";
+       splashdir = adbdir+"splash/";
+
 //      recoverydir = adbdir+"cwmrecovery/";
 //      stkrecoverydir = adbdir+"stkrecovery/";
 
      ui->setupUi(this);
      setFixedSize(size());
-
-
-
 
      ui->statusBar->addPermanentWidget(ui->server_running);
      ui->statusBar->addPermanentWidget( ui->progressBar);
@@ -361,7 +361,11 @@ QSqlDatabase db;
     connect(&watcher, SIGNAL(finished()), SLOT(finishedCopy()));
 
 
-    connect(&run_command,SIGNAL(readyReadStandardError()),this,SLOT( adberror() ));
+
+
+
+
+
 
 
     if (!(os == 1))
@@ -390,7 +394,6 @@ QSqlDatabase db;
 
 
 
-
  }
 
 
@@ -404,7 +407,44 @@ MainWindow::~MainWindow()
     db.close();
     delete ui;
 
+    //qDebug() << "Date:" << QDate::currentDate();
+
 }
+
+
+///////////////////////////////////////////////
+QString MainWindow::RunProcess(QString cstring)
+{
+ QProcess run_command;
+ run_command.setProcessChannelMode(QProcess::MergedChannels);
+ run_command.start(cstring);
+
+ run_command.waitForStarted();
+
+ while(run_command.state() != QProcess::NotRunning)
+     qApp->processEvents();
+
+ QString command=run_command.readAll();
+
+ return command;
+}
+
+
+/*
+
+//////////////////////////////////////////////
+void MainWindow::adberror()
+{
+stderrtxt=run_command.readAllStandardError();
+
+if (!stderrtxt.contains("error: device not found"))
+   {   logfile("QPROCESS : "+stderrtxt );
+}
+
+}
+
+
+*/
 
 
 
@@ -418,7 +458,7 @@ void MainWindow::notAndroid()
     ui->mvdataButton->setDisabled(true);
     ui->adbshellButton->setDisabled(true);
     ui->screencapButton->setDisabled(true);
-    ui->keypadButton->setDisabled(true);
+
 
     ui->connButton->setDisabled(true);
     ui->disButton->setDisabled(true);
@@ -444,7 +484,7 @@ void MainWindow::isAndroid()
     ui->mvdataButton->setDisabled(false);
     ui->adbshellButton->setDisabled(false);
     ui->screencapButton->setDisabled(false);
-    ui->keypadButton->setDisabled(false);
+
 
     ui->connButton->setDisabled(false);
     ui->disButton->setDisabled(false);
@@ -515,33 +555,6 @@ while(i == 0)
 
 }
 
-///////////////////////////////////////////////
-
-QString MainWindow::RunProcess(QString cstring)
-{
-
-
- run_command.start(cstring);
- run_command.waitForStarted();
-
- while(run_command.state() != QProcess::NotRunning)
- {
-     qApp->processEvents();
- }
-
- QString command=run_command.readAllStandardOutput();
-
- return command;
-
-}
-
-
-//////////////////////////////////////////////
-void MainWindow::adberror()
-{
-stderrtxt=run_command.readAllStandardError();
-logfile("QPROCESS : "+stderrtxt );
-}
 
 //////////////////////////////////////////////
 void MainWindow::rotate_logfile()
@@ -1735,6 +1748,8 @@ void MainWindow::get_data() {
 
 }
 
+
+
 /////////////////////////////////
 void MainWindow::onReqCompleted() {
    QNetworkReply *reply = qobject_cast<QNetworkReply *>(sender());
@@ -1776,6 +1791,12 @@ void MainWindow::onReqCompleted() {
        delete reply;
 
 }
+
+
+
+
+
+
 
 
 //////////////////////////////////////////////////////////////////////
@@ -1834,8 +1855,51 @@ void MainWindow::readInc()
 }
 
 ////////////////////////////////////////////////////////////////////////////
+bool MainWindow::installAPK(QString filename)
+{
+
+    QString cstring;
+    QString command;
+
+
+    QElapsedTimer rtimer;
+    int nMilliseconds;
+    rtimer.start();
+
+
+    ui->progressBar->setHidden(false);
+    ui->progressBar->setValue(0);
+
+
+    QTimer *timer = new QTimer(this);
+    connect(timer, SIGNAL(timeout()), this, SLOT(TimerEvent()));
+    timer->start(tsvalue);
+
+
+    logfile("Installing "+filename);
+    cstring = getadb() + " install -r " + '"'+ filename+'"';
+    command=RunProcess(cstring);
+    logfile(command);
+
+
+    ui->progressBar->setHidden(true);
+    nMilliseconds = rtimer.elapsed();
+    logfile("process time duration: "+ QString::number(nMilliseconds/1000)+ " seconds" );
+
+
+    if (!command.contains("bytes in") || command.contains("Failure"))
+    {
+        QMessageBox::critical(this,"",filename+" install failed.\nSee log.");
+        return false;
+    }
+    else return true;
+}
+
+////////////////////////////////////////////////////////////////////////////
 void MainWindow::on_sideload_Button_clicked()
 {
+
+    bool installer=false;
 
     QString lookup=daddr;
 
@@ -1843,9 +1907,6 @@ void MainWindow::on_sideload_Button_clicked()
       lookup=lookup+":"+port;
 
     isConnected=find_daddr(lookup);
-
-   // if (!isConnected && !isusb)
-          //on_connButton_clicked();
 
      if (!isConnected)
            { QMessageBox::critical(0,"",devstr2);
@@ -1859,61 +1920,30 @@ void MainWindow::on_sideload_Button_clicked()
        }
 
 
-    QString cstring;
-    QString command;
-
-    QElapsedTimer rtimer;
-    int nMilliseconds;
-    rtimer.start();
-
-   QString fileName = QFileDialog::getOpenFileName(this,
-          tr("Select app to install"), sldir , tr("APK Files (*.apk)"));
-
-
-    if (!fileName.isEmpty() )
+    QStringList filenames = QFileDialog::getOpenFileNames(this,tr("APK files"),QDir::currentPath(),tr("APK files (*.apk);;All files (*.*)") );
+    if( !filenames.isEmpty() )
     {
 
-    QFileInfo finfo(fileName);
-    sldir = finfo.absolutePath();
+        QMessageBox::StandardButton reply;
+          reply = QMessageBox::question(this, "Install", "Install APKs?",
+                                        QMessageBox::Yes|QMessageBox::No);
+          if (reply == QMessageBox::Yes)
+          {
+               for (int i =0;i<filenames.count();i++)
+              installer = installAPK(filenames.at(i));
 
-    QMessageBox::StandardButton reply;
-      reply = QMessageBox::question(this, "Install", "Install "+fileName+"?\n",
-                                    QMessageBox::Yes|QMessageBox::No);
-      if (reply == QMessageBox::Yes)
-      {
-
-
-          ui->progressBar->setHidden(false);
-          ui->progressBar->setValue(0);
+          }
 
 
-          QTimer *timer = new QTimer(this);
-          connect(timer, SIGNAL(timeout()), this, SLOT(TimerEvent()));
-          timer->start(tsvalue);
 
-           cstring = getadb() + " install -r " + '"'+ fileName+'"';
+          if (installer)
+          {
+              QMessageBox::information(this,"","APK(s) installed.\nSee log for details.");
 
+          }
 
-           QString command=RunProcess(cstring);
-
-           ui->progressBar->setHidden(true);
-
-           // logfile(cstring);
-           logfile(command);
-
-           nMilliseconds = rtimer.elapsed();
-           logfile("process time duration: "+ QString::number(nMilliseconds/1000)+ " seconds" );
-
-
-           if (command.contains("Success"))
-
-               QMessageBox::information(this,"","Installed");
-              else      
-               QMessageBox::critical(this,"","Install failed");
 
     }
-
-  }
 
 
 }
@@ -2056,10 +2086,10 @@ void MainWindow::on_connButton_clicked()
 
     QString cstring;
     QString command;
-    QString pkg1 = "package:com.amazon.device.software.ota";
-    QString pkg2 = "package:com.amazon.dcp";
 
 
+    //  QString pkg1 = "package:com.amazon.device.software.ota";
+   //  QString pkg2 = "package:com.amazon.dcp";
 
 
     if (isusb )
@@ -2088,31 +2118,30 @@ void MainWindow::on_connButton_clicked()
     rtimer.start();
 
 
-    QString sambastring;
-    QString sambacheck;
+    //QString sambastring;
+    //QString sambacheck;
 
       cstring = adb + " connect "+daddr+":"+port;
+
       command=RunProcess(cstring);
-      logfile("connect"+command);
-      logfile("");
-
-    logfile("connection attempt");
-    // logfile(cstring);
-    logfile(command);
-
 
     if (command.contains("connected to"))
     {   isConnected=true;
 
-
            on_refreshConnectedDevices_clicked();
-
+           logfile("Connected to "+daddr+":"+port);
 
     }
        else
+       {
         isConnected=false;
+        logfile("Unable to connect to: "+daddr+":"+port);
+       }
 
-     if(isConnected)
+
+
+
+    if(isConnected)
        {
 
 
@@ -2124,7 +2153,7 @@ void MainWindow::on_connButton_clicked()
 
       }
 
-     // firstrun=false;
+
 
      nMilliseconds = rtimer.elapsed();
      logfile("process time duration: "+ QString::number(nMilliseconds/1000)+ " seconds" );
@@ -2499,9 +2528,6 @@ void MainWindow::restoreAndroid()
 // extra rms
 
 
-
-
-
  QString dir = QFileDialog::getExistingDirectory(this, tr("Choose backup folder"),
   hdir,QFileDialog::ShowDirsOnly | QFileDialog::DontResolveSymlinks);
 
@@ -2575,26 +2601,22 @@ void MainWindow::restoreAndroid()
 
        command=RunProcess(cstring);
 
+
+
        cstring = getadb() + " push "+'"'+dir+'"'+ " "+mcpath;
 
         command=RunProcess(cstring);
 
         ui->progressBar->setHidden(true);
 
-        // logfile(cstring);
-        logfile(command);
-
         nMilliseconds = rtimer.elapsed();
         logfile("process time duration: "+ QString::number(nMilliseconds/1000)+ " seconds" );
 
 
-
-        if (stderrtxt.contains("bytes"))
+   if (command.contains("bytes"))
 
        {
 
-
-            stderrtxt="";
 
             QMessageBox::information(
                        this,
@@ -2606,7 +2628,6 @@ void MainWindow::restoreAndroid()
                cstring = getadb() + " shell echo xbmc.data="+envpath+" > /sdcard/xbmc_env.properties";
                command=RunProcess(cstring);
                logfile("create /sdcard/xbmc_env.properties");
-               // logfile(cstring);
                logfile(command);
            }
 
@@ -2812,12 +2833,12 @@ if (command.contains("No such file or directory"))
 
 
 
-           if (stderrtxt.contains("bytes"))
+           if (command.contains("bytes"))
 
 
            {
 
-               stderrtxt="";
+
 
                QMessageBox::information(
                            this,
@@ -3327,10 +3348,10 @@ rtimer.start();
     logfile(command);
 
 
-    if (!stderrtxt.contains("bytes"))
+    if (!command.contains("bytes"))
         {
 
-        stderrtxt="";
+
 
           logfile("error pushing xml script to device!");
           QMessageBox::critical(this,"","Error pushing xml from PC to device!");
@@ -3983,12 +4004,12 @@ rtimer.start();
 
 
 
-           if (stderrtxt.contains("bytes"))
+           if (command.contains("bytes"))
 
 
            {
 
-               stderrtxt="";
+
 
                QMessageBox::information(
                            this,
@@ -4836,9 +4857,8 @@ if (command.contains("No such file or directory"))
                   cstring = getadb() + " push "+filename2+ " "+xpath+filename1;
                   command=RunProcess(cstring);
 
-                   if (!stderrtxt.contains("bytes"))
+                   if (!command.contains("bytes"))
                       {
-                        stderrtxt="";
                         logfile(command);
                         logfile("error pushing xml script to device!");
                         QMessageBox::critical(this,"","Error pushing xml from PC to device!");
@@ -4963,12 +4983,12 @@ rtimer.start();
 
 
 
-           if (stderrtxt.contains("bytes"))
+           if (command.contains("bytes"))
 
 
            {
 
-               stderrtxt="";
+
 
                QMessageBox::information(
                            this,
@@ -5165,22 +5185,6 @@ void MainWindow::on_mvdataButton_clicked()
 
 }
 
-/////////////////////////////////////////////////
-void MainWindow::on_keypadButton_clicked()
-{
-    if (!isConnected)
-          { QMessageBox::critical(0,"",devstr2);
-             return;
-          }
-
-     QString cstring = getadb() + " shell input keyevent ";
-     keyboardDialog dialog;
-     dialog.setdaddressLabel(cstring);
-     dialog.exec();
-
-}
-
-
 //////////////////////////////////////////////////
 void MainWindow::on_actionView_Kodi_Log_triggered()
 {
@@ -5350,9 +5354,9 @@ void MainWindow::on_screencapButton_clicked()
          logfile(command);
 
 
-         if (!stderrtxt.contains("bytes"))
+         if (!command.contains("bytes"))
           {
-             stderrtxt="";
+
              logfile(command);
              QMessageBox::critical(
                          this,
@@ -5565,10 +5569,9 @@ if (command.contains("No such file or directory"))
       QString busybox = adbdir+"busybox";
       QString cstring = getadb() + " push "+busybox+ " /data/local/tmp/adblink/";
       QString command=RunProcess(cstring);
-      if (!stderrtxt.contains("bytes"))
+      if (!command.contains("bytes"))
         {
-          stderrtxt="";
-          logfile("busybox install failed ");
+           logfile("busybox install failed ");
            logfile(command);
            busypath="";
            QMessageBox::critical(0,"","busybox install failed. See log.");
@@ -5576,9 +5579,7 @@ if (command.contains("No such file or directory"))
           }
      else
       {
-          // logfile(cstring);
 
-          stderrtxt="";
 
           logfile(command);
 
@@ -5718,79 +5719,65 @@ if (!dirpath.isEmpty())
 
 }
 
- QString fileName = QFileDialog::getOpenFileName(this,
- "Push file to "+cname, pushdir, tr("Files (*)"));
-
-
- if (!fileName.isEmpty() )
- {
-
-     QFileInfo finfo(fileName);
-     pushdir = finfo.absolutePath();
-
-     QString cstring = getadb() + " shell ls "+xpath;
-
-     QString command=RunProcess(cstring);
-
-     // logfile(cstring);
-
-      if (command.contains("No such file or directory"))
-       { QMessageBox::critical(
-                      this,
-                     "",
-                      "Destination path missing. Check the Kodi partition setting in the device record, or run Kodi to set up internal folders.");
-          logfile(xpath);
-          logfile("Destination path missing. Check the Kodi partition setting in the device record, or run Kodi to set up internal folders.");
-          return;
-      }
 
 
 
 
-     QMessageBox::StandardButton reply;
-       reply = QMessageBox::question(this, "Push", "Push "+fileName+" to "+cname+"?",
-           QMessageBox::Yes|QMessageBox::No);
-       if (reply == QMessageBox::Yes) {
 
+      QStringList filenames = QFileDialog::getOpenFileNames(this,tr("All files"),QDir::currentPath(),tr("All files (*.*);;All files (*.*)") );
+      if( !filenames.isEmpty() )
+      {
 
-           ui->progressBar->setHidden(false);
-           ui->progressBar->setValue(0);
-
-
-           QTimer *timer = new QTimer(this);
-           connect(timer, SIGNAL(timeout()), this, SLOT(TimerEvent()));
-           timer->start(tsvalue);
-
-           cstring = getadb() + " push "+'"'+fileName+'"'+ " "+xpath;
-
-           command=RunProcess(cstring);
-
-           logfile(command);
-
-
-           if (stderrtxt.contains("bytes"))
+          QMessageBox::StandardButton reply;
+            reply = QMessageBox::question(this, "Push", "Push files?",
+                                          QMessageBox::Yes|QMessageBox::No);
+            if (reply == QMessageBox::Yes)
             {
-               stderrtxt="";
+                QString cstring = getadb() + " shell ls "+xpath;
+                QString command=RunProcess(cstring);
 
-               QMessageBox::information(
-                           this,
-                          "",
-                          "File Pushed." );
-           }
-               else
-           {
 
-               stderrtxt="";
+                 if (command.contains("No such file or directory"))
+                  { QMessageBox::critical(this,"","Destination path missing. Check the Kodi partition setting in the device record, or run Kodi to set up internal folders.");
+                     logfile(xpath);
+                     logfile("Destination path missing. Check the Kodi partition setting in the device record, or run Kodi to set up internal folders.");
+                     return;
+                 }
 
-               QMessageBox::critical(
-                           this,
-                           "",
-                        "Push failed ");
-           }
 
-   }
 
-}
+                ui->progressBar->setHidden(false);
+                ui->progressBar->setValue(0);
+
+                QTimer *timer = new QTimer(this);
+                connect(timer, SIGNAL(timeout()), this, SLOT(TimerEvent()));
+                timer->start(tsvalue);
+                bool error = false;
+                for (int i =0;i<filenames.count();i++)
+                {
+                    cstring = getadb() + " push "+'"'+filenames.at(i)+'"'+ " "+xpath;
+                    command=RunProcess(cstring);
+                    if (command.contains("bytes"))
+                      { logfile(filenames.at(i)+" pushed");
+                       logfile(command);
+                       }
+                    else
+                       {  logfile(filenames.at(i)+" not pushed");
+                          logfile(command);
+                          error = true;
+                       }
+                }
+
+                if (!error)
+                    QMessageBox::information(this,"","File(s) pushed.");
+                  else
+                     QMessageBox::critical(this,"","File(s) not pushed. See log.");
+
+
+     }
+  }
+
+
 
  ui->progressBar->setHidden(true);
  nMilliseconds = rtimer.elapsed();
@@ -5991,10 +5978,10 @@ void MainWindow::on_fpullButton_clicked()
              //QMessageBox::critical(this,"",command);
 
 
-             if (!stderrtxt.contains("bytes"))
+             if (!command.contains("bytes"))
               {
 
-                 stderrtxt="";
+
                  logfile("pull failed");
                  QMessageBox::critical(
                              this,
@@ -6596,16 +6583,14 @@ void MainWindow::editAndroid()
              command=RunProcess(cstring);
 
 
-             if (!stderrtxt.contains("bytes"))
+             if (!command.contains("bytes"))
               {
-
-                 //stderrtxt="";
                  logfile("edit failed");
                  logfile(command);
                  QMessageBox::critical(
                              this,
                             "",
-                             "Edit failed "+stderrtxt);
+                             "Edit failed "+command);
                  return;
              }
 
@@ -6656,9 +6641,8 @@ void MainWindow::editAndroid()
                    command=RunProcess(cstring);
                    logfile(command);
 
-                   if (!stderrtxt.contains("bytes"))
-                    { stderrtxt="";
-                       QMessageBox::critical(this,"","Backup of "+filename+ "failed. Edit abandoned." );
+                   if (!command.contains("bytes"))
+                    {  QMessageBox::critical(this,"","Backup of "+filename+ "failed. Edit abandoned." );
                       logfile("Backup of "+filename+ "failed");
                        return;
                    }
@@ -6669,9 +6653,8 @@ void MainWindow::editAndroid()
                    command=RunProcess(cstring);
                    logfile(command);
 
-                   if (!stderrtxt.contains("bytes"))
-                    { stderrtxt="";
-                      QMessageBox::critical(this,"","Problem replacing "+filename+ ". Edit abandoned." );
+                   if (!command.contains("bytes"))
+                    {  QMessageBox::critical(this,"","Problem replacing "+filename+ ". Edit abandoned." );
                       logfile("Problem replacing "+filename+ ". Edit abandoned." );
                        return;
                    }
@@ -6863,9 +6846,8 @@ void MainWindow::editGeneric()
              logfile(command);
 
 
-             if (!stderrtxt.contains("bytes"))
+             if (!command.contains("bytes"))
               {
-                 stderrtxt="";
                  logfile("edit failed");
                  logfile(command);
                  QMessageBox::critical(
@@ -6920,8 +6902,8 @@ void MainWindow::editGeneric()
                    command=RunProcess(cstring);
                    logfile(command);
 
-                   if (!stderrtxt.contains("bytes"))
-                    { stderrtxt="";
+                   if (!command.contains("bytes"))
+                    {
                       QMessageBox::critical(this,"","Backup of "+filename+ "failed. Edit abandoned." );
                       logfile("Backup of "+filename+ "failed");
                        return;
@@ -6933,7 +6915,7 @@ void MainWindow::editGeneric()
                    command=RunProcess(cstring);
                    logfile(command);
 
-                   if (!stderrtxt.contains("bytes"))
+                   if (!command.contains("bytes"))
                     { QMessageBox::critical(this,"","Problem replacing "+filename+ ". Edit abandoned." );
                       logfile("Problem replacing "+filename+ ". Edit abandoned." );
                        return;
@@ -7114,4 +7096,233 @@ void MainWindow::usbbuttons(bool isusb)
                 ui->disButton->setDisabled(true);
               }
 
+}
+
+
+// am start -n org.xbmc.kodi/org.xbmc.kodi.Splash
+// am start -n com.semperpax.spmc16/com.semperpax.spmc16.Splash
+// am force-stop org.xbmc.kodi
+
+//////////////////////////////////////////////////////
+
+void MainWindow::on_actionStop_Application_triggered()
+{
+    QString lookup=daddr;
+
+    if(!isusb)
+     lookup=lookup+":"+port;
+
+    isConnected=find_daddr(lookup);
+
+    if (!isConnected)
+          { QMessageBox::critical(0,"",devstr2);
+             return;
+          }
+
+    if(!is_busybox())
+    {
+        QMessageBox::critical(0,"","Busybox installation failed.");
+       return;
+      }
+
+
+    forcequitDialog dialog(false);
+
+    if(dialog.exec() == QDialog::Accepted)
+    {
+    QString cstring = getadb() + " shell am force-stop "+dialog.packagename();
+    QString command=RunProcess(cstring);
+    logfile(command);
+    }
+
+
+}
+
+/////////////////////////////////////////////////////////
+
+void MainWindow::on_actionStart_Application_triggered()
+{
+
+    QString lookup=daddr;
+
+    if(!isusb)
+     lookup=lookup+":"+port;
+
+    isConnected=find_daddr(lookup);
+
+    if (!isConnected)
+          { QMessageBox::critical(0,"",devstr2);
+             return;
+          }
+
+    if(!is_busybox())
+    {
+        QMessageBox::critical(0,"","Busybox installation failed.");
+       return;
+      }
+
+
+    forcequitDialog dialog(true);
+
+    if(dialog.exec() == QDialog::Accepted)
+    {
+
+        QString cstring = getadb() + " shell am start -n "+dialog.packagename();
+        QString command=RunProcess(cstring);
+        logfile(command);
+
+    }
+
+}
+
+
+////////////////////////////////////////////////
+
+void MainWindow::on_getkodiButton_clicked()
+{
+
+
+
+
+        QMessageBox::StandardButton reply;
+         reply = QMessageBox::question(0, "","Download Kodi?",
+                 QMessageBox::Yes|QMessageBox::No);
+           if (reply == QMessageBox::Yes)
+            {
+               get_kodi_address(armurl);
+             }
+
+
+
+
+}
+
+
+
+//////////////////////////////////////////////////////////////////////
+
+void MainWindow::get_kodi_address(QString mcurl) {
+   QNetworkRequest request;
+
+
+
+   request.setUrl(QUrl(mcurl));
+
+   QNetworkAccessManager *nam = new QNetworkAccessManager();
+   QNetworkReply *reply = nam->get(request);
+
+   connect(reply, SIGNAL(finished()),
+           this, SLOT(onArmCompleted()));
+
+}
+
+
+
+/////////////////////////////////////////
+
+void MainWindow::onArmCompleted() {
+   QNetworkReply *reply = qobject_cast<QNetworkReply *>(sender());
+
+
+   if (reply->error() != QNetworkReply::NoError)
+   {
+
+       int err = reply->error();
+       QString s2 = QString::number(err);
+       QMessageBox::critical(0, "","Network error: " + s2,QMessageBox::Cancel);
+       return;
+
+   }
+
+   QByteArray data = reply->readAll();
+
+   QString s1(data);
+
+       s1 = strip(s1);
+
+      delete reply;
+
+       ui->progressBar->setHidden(false);
+       ui->progressBar->setValue(0);
+
+
+       QTimer *timer = new QTimer(this);
+       connect(timer, SIGNAL(timeout()), this, SLOT(TimerEvent()));
+       timer->start(tsvalue);
+
+       downloadFile(s1,pulldir);
+
+}
+
+
+///////////////////////////////////////////////////////////////////////////////////
+
+void MainWindow::downloadFile(const QString &url, const QString &path)
+{
+    QNetworkAccessManager m_NetworkMngr;
+    QNetworkReply *reply= m_NetworkMngr.get(QNetworkRequest(url));
+    QEventLoop loop;
+    QObject::connect(reply, SIGNAL(finished()),&loop, SLOT(quit()));
+    loop.exec();
+    QUrl aUrl(url);
+    QFileInfo fileInfo=aUrl.path();
+
+    QFile file(path+"/"+fileInfo.fileName());
+    file.open(QIODevice::WriteOnly);
+    file.write(reply->readAll());
+
+    delete reply;
+
+    ui->progressBar->setHidden(true);
+    ui->progressBar->setValue(0);
+
+
+if (isConnected)
+ {
+    QMessageBox::StandardButton rep;
+      rep = QMessageBox::question(this, "Install", "Install Kodi?",
+                                    QMessageBox::Yes|QMessageBox::No);
+      if (rep == QMessageBox::Yes)
+      {
+           bool installer = installAPK(path+"/"+fileInfo.fileName());
+
+               if (installer)
+                   QMessageBox::information(this,"","Kodi installed.\nSee log for details.");
+        }
+
+  }
+
+else
+
+{
+
+    QMessageBox::information(this,"","Kodi downloaded.");
+}
+
+
+}
+
+////////////////////////////////////////////////
+
+void MainWindow::on_keypadButton_clicked()
+{
+    if (!isConnected)
+          { QMessageBox::critical(0,"",devstr2);
+             return;
+          }
+
+     QString cstring = getadb() + " shell input keyevent ";
+     keyboardDialog dialog;
+     dialog.setdaddressLabel(cstring);
+     dialog.exec();
+
+}
+
+
+////////////////////////////////////////////////
+
+void MainWindow::on_actionDownload_SPMC_triggered()
+{
+    QString link = "http://spmc.semperpax.com/";
+    QDesktopServices::openUrl(QUrl(link));
 }

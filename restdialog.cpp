@@ -45,6 +45,7 @@ restDialog::restDialog(QWidget *parent) :
     ui(new Ui::restDialog)
 {
     ui->setupUi(this);
+    setWindowFlags(windowFlags() & ~Qt::WindowContextHelpButtonHint);
 
     if (os_restore == 1)
        {
